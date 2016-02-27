@@ -1,0 +1,86 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <link rel="import" href="../iron-jsonp-library.html">
+
+  </head>
+  <body>
+    <test-fixture id="jsonp-fixture">
+      <template is="dom-template">
+        <iron-jsonp-library id="jsonp"
+          library-url="{{libraryUrl}}"
+          notify-event="api-load"></iron-jsonp-library>
+      </template>
+    </test-fixture>
+
+    <script>
+
+      suite('<iron-jsonp-library>', function() {
+
+        test('good library loads', function(done) {
+          var jsonp = fixture('jsonp-fixture');
+          jsonp.addEventListener('api-load', function() {
+              // Ensure that we can load the same library twice.
+              // TODO: assert that only one network request is made.
+              var second = document.createElement('iron-jsonp-library');
+              second.notifyEvent = 'api-load';
+              second.addEventListener('api-load', function() { done() });
+              second.addEventListener('library-error-message-changed', function() { done('second attempt fails')});
+              second.libraryUrl = "https://apis.google.com/js/plusone.js?onload=%%callback%%";
+            }
+          );
+          jsonp.addEventListener('library-error-message-changed', function() {
+              done('library did not load');
+            }
+          );
+          jsonp.libraryUrl = "https://apis.google.com/js/plusone.js?onload=%%callback%%";
+
+        });
+
+        test('bad library dns fails to load', function(done) {
+          var jsonp = fixture('jsonp-fixture');
+          jsonp.addEventListener('api-load', function() {
+              done('bad dns somehow loaded?');
+            }
+          );
+          jsonp.addEventListener('library-error-message-changed', function() {
+              assert.isNotNull(jsonp.libraryErrorMessage);
+              done();
+            }
+          );
+          jsonp.libraryUrl = "https://badapis.google.com/js/plusone.js?onload=%%callback%%";
+        });
+
+        test('libraryurl mising %%callback%%', function(done) {
+          var jsonp = fixture('jsonp-fixture');
+          jsonp.addEventListener('api-load', function() {
+              done('no callback somehow loaded?');
+            }
+          );
+          jsonp.addEventListener('library-error-message-changed', function() {
+              assert.isNotNull(jsonp.libraryErrorMessage);
+              done();
+            }
+          );
+          jsonp.libraryUrl = "https://apis.google.com/js/plusone.js?onload";
+        });
+
+      });
+    </script>
+
+  </body>
+</html>
