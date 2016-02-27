@@ -11,6 +11,7 @@ Free Material Design HTML5,CSS3 mobile-friendly Polymer Web App template, easy&a
 - Uses a last technologies such as Web-Components, Jquery, HTML5, CSS3
 - Supports old browsers like IE, powered by polyfills (http://webcomponents.org/polyfills/)
 - Supports google services/APIs
+- Clear, very readable code with comments 
 
 ## Check out Live-Preview
 <a href="http://mishushakov.github.io/Polymer-Web-App-Template/">CLICK</a>
